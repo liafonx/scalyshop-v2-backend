@@ -1,17 +1,8 @@
 var express = require('express');
 var glob = require("glob");
-var fs = require("fs");
 var Order = require('../models/order');
 
 var router = express.Router();
-
-// TODO remove
-const client = require('prom-client');
-const totalOrderMetric = new client.Histogram({
-  name: 'total_order_value',
-  help: 'Histogram value of total value of submitted orders',
-  buckets: client.linearBuckets(0, 20, 10),
-});
 
 // Return all orders
 router.get('/api/orders', function(req, res, next) {
@@ -81,12 +72,6 @@ router.patch('/api/orders/:id', function(req, res, next) {
 	var id = req.params.id;
 	Order.findById(id)
     .then(order => {
-
-        // TODO remove
-        // send business metric with prom-client
-        if(order.totalPrice != null) {
-            totalOrderMetric.observe(order.totalPrice);
-        }
 
         if(order == null) {
             return res.status(404).json({'message': 'Order with id ${id} not found'});
