@@ -3,14 +3,6 @@ var glob = require("glob");
 var fs = require("fs");
 var Product = require('../models/product');
 
-// TODO remove for template
-const unleash_lib = require('unleash-client');
-const unleash = unleash_lib.initialize({
-    url: 'https://git.chalmers.se/api/v4/feature_flags/unleash/17076',
-    appName: 'production',
-    instanceId: 'glffct-WCVx6VMsyww27s3Ph6Er'
-  });
-
 var router = express.Router();
 
 const JSON_DUMMY_FILES='dummy_data';
@@ -19,28 +11,13 @@ const JSON_STRESS_FILES='stress_data';
 // Return all products
 router.get('/api/products', function(req, res, next) {
     
-    // TODO remove for template
-    if(unleash.isEnabled('new-sorting')) {
-        // new implementation
-        console.log('New sorting feature toggle enabled');
-        Product.find().sort({'price': -1})
-        .then(products => {
-            res.json({'products': products});
-        })
-        .catch(err => {
-            return next(err);
-        });
-
-    } else {
-        console.log('Old sorting enabled');
-        Product.find()
-        .then(products => {
-            res.json({'products': products});
-        })
-        .catch(err => {
-            return next(err);
-        });
-    }
+    Product.find()
+    .then(products => {
+        res.json({'products': products});
+    })
+    .catch(err => {
+        return next(err);
+    });
 });
 
 // Return specific product by ID
