@@ -8,6 +8,7 @@ var history = require('connect-history-api-fallback');
 
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
+const favoriteController = require('./controllers/favorites');
 
 // Variables
 var mongoHost = process.env.MONGODB_HOST || 'localhost';
@@ -68,6 +69,7 @@ app.post('/api/crash', function(req, res, next) {
 
 app.use(productsController);
 app.use(ordersController);
+app.use(favoriteController)
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
