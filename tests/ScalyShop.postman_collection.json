@@ -65,6 +65,35 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "getFavs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/favorites",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"favorites"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
