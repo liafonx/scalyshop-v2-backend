@@ -11,7 +11,7 @@ var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
 
 // Variables
-var mongoHost = process.env.MONGODB_HOST || 'localhost';
+var mongoHost = process.env.MONGODB_HOST || 'host.docker.internal';
 var mongoDB = process.env.MONGODB_DB || 'scalyDB';
 // var mongoPort = process.env.MONGODB_PORT || '27017';
 var mongoUser = process.env.MONGODB_USER || undefined;
@@ -70,6 +70,10 @@ app.post('/api/crash', function(req, res, next) {
 app.use(productsController);
 app.use(ordersController);
 app.use(favoriteController)
+
+app.get('/api/', function(req, res) {
+    res.json({'message': 'Welcome to the ScalyShop API!'});
+});
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
