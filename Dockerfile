@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5045
 
 # Define the command to run the backend
-CMD ["npm", "start"]
+CMD ["npm",  "run", "serve"]

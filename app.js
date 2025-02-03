@@ -11,7 +11,7 @@ var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
 
 // Variables
-var mongoHost = process.env.MONGODB_HOST || 'host.docker.internal';
+var mongoHost = process.env.MONGODB_HOST || 'localhost';
 var mongoDB = process.env.MONGODB_DB || 'scalyDB';
 // var mongoPort = process.env.MONGODB_PORT || '27017';
 var mongoUser = process.env.MONGODB_USER || undefined;
