@@ -16,5 +16,8 @@ COPY . .
 # Expose the port the backend runs on
 EXPOSE 5045
 
+#Set database config
+ENV MONGODB_HOST=mongodb
+
 # Define the command to run the backend
-CMD ["npm",  "run", "serve"]
+CMD ["npm",  "start"]
