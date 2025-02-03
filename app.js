@@ -71,6 +71,10 @@ app.use(productsController);
 app.use(ordersController);
 app.use(favoriteController)
 
+app.get('/api/', function(req, res) {
+    res.json({'message': 'Welcome to the ScalyShop API!'});
+});
+
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use('/api/*', function (req, res) {
     res.status(404).json({ 'message': 'Not Found' });
