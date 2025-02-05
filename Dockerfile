@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:18
+FROM --platform=linux/amd64 node:18
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -14,10 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port the backend runs on
-EXPOSE 5045
-
-#Set database config
-ENV MONGODB_HOST=mongodb
+EXPOSE 5000
 
 # Define the command to run the backend
 CMD ["npm",  "start"]
