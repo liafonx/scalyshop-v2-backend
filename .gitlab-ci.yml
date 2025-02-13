@@ -56,6 +56,9 @@ deploy-helm:
     - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
   script:
-    - /deploy/deploy.sh
+    - echo "Updating Helm repositories..."
+    - helm repo update
+    - echo "Deploying the application using Helm upgrade --install..."
+    - helm upgrade --install scalyshop-backend ./scalyshop-backend
   rules:
     - if: '$CI_COMMIT_BRANCH == "backend-local"'
