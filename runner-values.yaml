@@ -24,7 +24,7 @@ serviceAccount:
       verbs: ["list", "get", "create", "delete", "update"]
     - apiGroups: [""]
       resources: ["configmaps"]
-      verbs: ["list", "get", "create", "delete", "update"] 
+      verbs: ["list", "get", "create", "delete", "update"]
 
 
 runners:
@@ -37,3 +37,5 @@ runners:
 concurrent: 3  # Increase to allow more jobs to run simultaneously
 
 #helm install --namespace scalyshop gitlab-runner -f runner-values.yaml gitlab/gitlab-runner
+
+#kubectl create rolebinding --namespace=scalyshop scalyshop-binding --role=gitlab-runner --serviceaccount=scalyshop:default
