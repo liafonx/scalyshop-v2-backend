@@ -1,0 +1,15 @@
+gitlabUrl: https://git.chalmers.se
+runnerToken: "glrt-t2_nSH2rZTzFsj-roupGxRZ"
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+
+runners:
+  privileged: true
+
+concurrent: 3  # Increase to allow more jobs to run simultaneously
+
+#helm install --namespace scalyshop gitlab-runner -f runner-values.yaml gitlab/gitlab-runner

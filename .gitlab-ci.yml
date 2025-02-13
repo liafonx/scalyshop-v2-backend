@@ -5,20 +5,23 @@ variables:
   DOCKER_HOST: tcp://0.0.0.0:2375
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ''
+  MONGODB_HOST: mongodb.default.svc.cluster.local
+  MONGODB_USER: scaly
+  MONGODB_PW: scalypw
 
 stages:
   - build
   # - test
-  # - deploy
+  - deploy
 
 build-job:
   stage: build
   image: '${CI_TEMPLATE_REGISTRY_HOST}/gitlab-org/cluster-integration/auto-build-image:${AUTO_BUILD_IMAGE_VERSION}'
   services:
-    - name: 'docker:20.10.12-dind'
+    - name: 'docker:24.0.5-dind'
       command: ['--tls=false', '--host=tcp://0.0.0.0:2375']
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY    
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - |
       if [[ -z "$CI_COMMIT_TAG" ]]; then
@@ -30,13 +33,29 @@ build-job:
       fi
     - /build/build.sh
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == 'backend-local'
   artifacts:
     reports:
       dotenv: gl-auto-build-variables.env
+    paths:
+      - dist
 
 # test-job:
-#   TODO  
-
-# deploy-helm:
 #   TODO
+
+deploy-helm:
+  stage: deploy
+  image: alpine/helm:3.9.0
+  dependencies:
+    - build-job
+  environment:
+    name: production
+    url: https://your-production-url.example.com
+  before_script:
+    # Decode the base64-encoded kubeconfig from CI/CD variable and set it for kubectl/helm.
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+    - export KUBECONFIG=$PWD/kubeconfig
+  script:
+    - /deploy/deploy.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "backend-local"'
