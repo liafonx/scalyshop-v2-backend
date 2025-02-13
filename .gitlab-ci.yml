@@ -42,7 +42,7 @@ build-job:
 
 deploy-helm:
   stage: deploy
-  image: lachlanevenson/k8s-helm
+  image: dtzar/helm-kubectl
   dependencies:
     - build-job
   before_script:
