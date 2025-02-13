@@ -42,7 +42,7 @@ build-job:
 
 deploy-helm:
   stage: deploy
-  image: alpine/helm:3.9.0
+  image: lachlanevenson/k8s-helm
   dependencies:
     - build-job
   before_script:
