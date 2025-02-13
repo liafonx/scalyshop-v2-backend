@@ -5,7 +5,6 @@ metadata:
   name: {{ include "scalyshop-backend.fullname" . }}
   labels:
     {{- include "scalyshop-backend.labels" . | nindent 4 }}
-    app: {{ .Values.appLabel | quote }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

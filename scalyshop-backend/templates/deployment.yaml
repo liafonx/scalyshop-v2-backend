@@ -4,7 +4,6 @@ metadata:
   name: {{ include "scalyshop-backend.fullname" . }}
   labels:
     {{- include "scalyshop-backend.labels" . | nindent 4 }}
-    app: {{ .Values.appLabel | quote }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -12,7 +11,6 @@ spec:
   selector:
     matchLabels:
       {{- include "scalyshop-backend.selectorLabels" . | nindent 6 }}
-      app: {{ .Values.appLabel | quote }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -24,7 +22,6 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        app: {{ .Values.appLabel | quote }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

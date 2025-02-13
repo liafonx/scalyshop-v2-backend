@@ -4,7 +4,6 @@ metadata:
   name: {{ include "scalyshop-backend.fullname" . }}
   labels:
     {{- include "scalyshop-backend.labels" . | nindent 4 }}
-    app: {{ .Values.appLabel | quote }}
 spec:
   type: {{ .Values.service.type }}
   ports:
