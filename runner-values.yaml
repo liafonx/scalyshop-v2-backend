@@ -9,7 +9,7 @@ serviceAccount:
 
 runners:
   privileged: true
-
+  
 concurrent: 3  # Increase to allow more jobs to run simultaneously
 
 #helm install --namespace scalyshop gitlab-runner -f runner-values.yaml gitlab/gitlab-runner
