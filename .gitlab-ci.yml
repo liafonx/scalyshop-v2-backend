@@ -56,8 +56,6 @@ deploy-helm:
     - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
   script:
-    - echo "Updating Helm repositories..."
-    - helm repo update
     - echo "Deploying the application using Helm upgrade --install..."
     - helm upgrade --install scalyshop-backend ./scalyshop-backend \
       --set image.repository="$CI_APPLICATION_REPOSITORY",image.tag="$CI_APPLICATION_TAG" \
