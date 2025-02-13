@@ -45,15 +45,12 @@ deploy-helm:
   image: alpine/helm:3.9.0
   dependencies:
     - build-job
-  environment:
-    name: production
-    url: https://your-production-url.example.com
   before_script:
     # Decode the base64-encoded kubeconfig from CI/CD variable and set it for kubectl/helm.
     - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
   script:
     - echo "Deploying the application using Helm upgrade --install..."
-    - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository="$CI_APPLICATION_REPOSITORY",image.tag="$CI_APPLICATION_TAG"
+    - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository=$CI_APPLICATION_REPOSITORY,image.tag=$CI_APPLICATION_TAG
   rules:
     - if: '$CI_COMMIT_BRANCH == "backend-local"'
