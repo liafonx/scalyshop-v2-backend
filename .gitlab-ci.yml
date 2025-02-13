@@ -51,6 +51,7 @@ deploy-helm:
     - export KUBECONFIG=$PWD/kubeconfig
   script:
     - echo "Deploying the application using Helm upgrade --install..."
+    - echo "${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG}"
     - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository=${CI_APPLICATION_REPOSITORY},image.tag=${CI_APPLICATION_TAG}
   rules:
     - if: '$CI_COMMIT_BRANCH == "backend-local"'
