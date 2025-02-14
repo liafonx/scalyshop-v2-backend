@@ -1,0 +1,59 @@
+image: alpine:latest
+
+variables:
+  AUTO_BUILD_IMAGE_VERSION: 'v4.3.0'
+  DOCKER_HOST: tcp://0.0.0.0:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ''
+  CI_APPLICATION_TAG: $CI_COMMIT_SHORT_SHA  # Use the commit short SHA as Docker image tag
+
+stages:
+  - build
+  # - test
+  - deploy
+
+build-job:
+  stage: build
+  image: '${CI_TEMPLATE_REGISTRY_HOST}/gitlab-org/cluster-integration/auto-build-image:${AUTO_BUILD_IMAGE_VERSION}'
+  services:
+    - name: 'docker:20.10.12-dind'
+      command: ['--tls=false', '--host=tcp://0.0.0.0:2375']
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY    
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHORT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - /build/build.sh
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Run on default branch (main)
+    - if: $CI_COMMIT_BRANCH == "feat-ci"
+  artifacts:
+    reports:
+      dotenv: gl-auto-build-variables.env
+
+# test-job:
+#   TODO  
+
+deploy-job:
+  stage: deploy
+  image: 'alpine:latest'
+  before_script:
+    - apk add --no-cache curl bash # Install curl and bash
+    - curl -sL https://helm.sh/install | bash  # Install Helm
+  script: # Use Helm to deploy the backend
+    - |
+      helm upgrade --install scalyshop-backend ./scalyshop-backend \
+        --set image.repository=$CI_REGISTRY_IMAGE \
+        --set image.tag=$CI_APPLICATION_TAG \
+        --namespace scalyshop
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "feat-ci"
+  # when: on_success
+  when: manual  # Add manual approval step
