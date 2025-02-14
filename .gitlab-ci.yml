@@ -53,6 +53,6 @@ deploy-helm:
     - echo "Deploying the application using Helm upgrade --install..."
     - echo "${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG}"
     - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository="${CI_APPLICATION_REPOSITORY}",image.tag="${CI_APPLICATION_TAG}"
-    - kubectl rollout status deployment/scalyshop-backend -n scalyshop --timeout=30s
+    - kubectl wait --for=condition=Available --timeout=60s deployment/scalyshop-frontend -n scalyshop
   rules:
     - if: '$CI_COMMIT_BRANCH == "backend-local"'
