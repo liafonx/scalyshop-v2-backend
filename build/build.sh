@@ -3,7 +3,7 @@ set -e  # Stop on errors
 
 echo "Building Docker image: ${CI_REGISTRY_IMAGE}:${CI_APPLICATION_TAG}"
 
-docker build --provenance=false -t ${CI_REGISTRY_IMAGE}:${CI_APPLICATION_TAG} .
+docker build -t ${CI_REGISTRY_IMAGE}:${CI_APPLICATION_TAG} .
 
 echo "Pushing Docker image to registry..."
 docker push ${CI_REGISTRY_IMAGE}:${CI_APPLICATION_TAG}
