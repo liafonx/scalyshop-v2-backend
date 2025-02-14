@@ -31,5 +31,8 @@ rules:
   - apiGroups: ["apps"]
     resources: ["deployments"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
   #kubectl create rolebinding --namespace=scalyshop scalyshop-binding --role=gitlab-runner --serviceaccount=scalyshop:default
