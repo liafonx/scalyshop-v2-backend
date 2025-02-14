@@ -1,12 +1,5 @@
 image: alpine:latest
 
-variables:
-  AUTO_BUILD_IMAGE_VERSION: "v4.3.0"
-  DOCKER_HOST: tcp://0.0.0.0:2375
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-  CI_APPLICATION_TAG: $CI_COMMIT_SHORT_SHA # Use the commit short SHA as Docker image tag
-
 stages:
   - build
   - test
@@ -20,23 +13,14 @@ stages:
 build-job:
   <<: *default_rules
   stage: build
-  image: "${CI_TEMPLATE_REGISTRY_HOST}/gitlab-org/cluster-integration/auto-build-image:${AUTO_BUILD_IMAGE_VERSION}"
-  services:
-    - name: "docker:20.10.12-dind"
-      command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
-  before_script:
-    - chmod +x build/build.sh
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   script:
-    - |
-      if [[ -z "$CI_COMMIT_TAG" ]]; then
-        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
-        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHORT_SHA}
-      else
-        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
-        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
-      fi
-    - build/build.sh
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
 
 test-job:
   <<: *default_rules
@@ -61,7 +45,7 @@ deploy-job:
     - |
       helm upgrade --install scalyshop-backend ./scalyshop-backend \
         --set image.repository=$CI_REGISTRY_IMAGE \
-        --set image.tag=$CI_APPLICATION_TAG \
+        --set image.tag=$CI_COMMIT_TAG \
         --namespace scalyshop \
         --wait --timeout 300s --debug
   when: on_success
