@@ -42,10 +42,7 @@ build-job:
 
 deploy-job:
   stage: deploy
-  image: 'alpine:latest'
-  before_script:
-    - apk add --no-cache curl bash # Install curl and bash
-    - curl -sL https://helm.sh/install | bash  # Install Helm
+  image: alpine/helm:latest
   script: # Use Helm to deploy the backend
     - echo "Deploying application with Helm..."
     - |
