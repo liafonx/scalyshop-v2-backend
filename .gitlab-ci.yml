@@ -46,11 +46,6 @@ test-job:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
-  variables:
-    MONGODB_HOST: "mongodb.default.svc.cluster.local"
-    BACKEND_PORT: 5000
-    MONGODB_USER: "scaly"
-    MONGODB_PW: "scalypw"
   script:
     - echo "Running test..."
     - npm install
