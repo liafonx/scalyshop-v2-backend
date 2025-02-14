@@ -47,13 +47,14 @@ deploy-job:
     - apk add --no-cache curl bash # Install curl and bash
     - curl -sL https://helm.sh/install | bash  # Install Helm
   script: # Use Helm to deploy the backend
+    - echo "Deploying application with Helm..."
     - |
       helm upgrade --install scalyshop-backend ./scalyshop-backend \
         --set image.repository=$CI_REGISTRY_IMAGE \
         --set image.tag=$CI_APPLICATION_TAG \
-        --namespace scalyshop
+        --namespace scalyshop \
+        --wait --timeout 300s --debug
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH == "feat-ci"
-  # when: on_success
-  when: manual  # Add manual approval step
+  when: on_success
