@@ -57,7 +57,7 @@ service:
   port: 5045
 
 env:
-  MONGODB_HOST: "mongodb.gitlab-managed-apps.svc.cluster.local"
+  MONGODB_HOST: "mongodb.local.svc.cluster.local"
   BACKEND_PORT: 5045
   MONGODB_USER: "scaly"
   MONGODB_PW: "scalypw"
@@ -72,7 +72,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: backend.k8s.orb.local
+    - host: backend.34-88-48-68.nip.io
       paths:
         - path: /
           pathType: Prefix
