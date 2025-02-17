@@ -58,7 +58,7 @@ service:
   port: 5000
 
 env:
-  MONGODB_HOST: "mongodb.default.svc.cluster.local"
+  MONGODB_HOST: "mongodb.gitlab-managed-apps.svc.cluster.local"
   BACKEND_PORT: 5000
   MONGODB_USER: "scaly"
   MONGODB_PW: "scalypw"
