@@ -51,7 +51,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/api/serverstatus', function(req, res) {
-    res.json({'message': 'Your server appears to be live and well.'});
+    res.json({'message': 'Your server appears to be live and well.😊'});
 });
 
 // return an error (on purpose, for monitoring testing)
