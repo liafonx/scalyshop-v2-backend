@@ -35,6 +35,10 @@ rbac:
       resources: ["ingresses"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
+serviceAccount:
+  create: true
+  name: "gitlab-runner"
+
 runners:
   privileged: true
   config: |

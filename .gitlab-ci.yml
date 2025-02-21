@@ -8,7 +8,6 @@ variables:
 
 stages:
   - build
-  # - test
   - deploy
 
 build-job:
@@ -16,7 +15,6 @@ build-job:
   image: 'registry.gitlab.com/gitlab-org/cluster-integration/auto-build-image:${AUTO_BUILD_IMAGE_VERSION}'
   services:
     - name: 'docker:24.0.5-dind'
-#      command: ['--tls=false', '--host=tcp://localhost:2375']
       variables:
         HEALTHCHECK_TCP_PORT: "2375"
   before_script:
@@ -53,6 +51,7 @@ deploy-helm:
     # Decode the base64-encoded kubeconfig from CI/CD variable and set it for kubectl/helm.
     - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
+    - kubectl get pod $HOSTNAME -n scalyshop -o jsonpath="{.spec.serviceAccountName}"
   script:
     - echo "Deploying the application using Helm upgrade --install..."
     - echo "${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG}"
