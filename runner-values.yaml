@@ -5,6 +5,7 @@ rbac:
     create: true
 
 runners:
+  privileged: true
   config: |
     [[runners]]
       [runners.kubernetes]
