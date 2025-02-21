@@ -1,4 +1,4 @@
-#image: alpine:latest
+image: alpine:latest
 
 variables:
   AUTO_BUILD_IMAGE_VERSION: 'v4.3.0'
@@ -19,7 +19,6 @@ build-job:
         HEALTHCHECK_TCP_PORT: "2375"
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker info
   script:
     - |
       if [[ -z "$CI_COMMIT_TAG" ]]; then
@@ -29,15 +28,13 @@ build-job:
         export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
         export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
       fi
-    - cat /build/build.sh
-    - /build/build.sh
+    - docker pull $CI_APPLICATION_REPOSITORY || true
+    - docker build --cache-from $CI_APPLICATION_REPOSITORY -t $CI_APPLICATION_REPOSITORY .
+    - docker tag $CI_APPLICATION_REPOSITORY $CI_APPLICATION_TAG
+    - docker push $CI_APPLICATION_REPOSITORY
+    - docker push $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG
   rules:
     - if: $CI_COMMIT_BRANCH == 'backend-local'
-  artifacts:
-    reports:
-      dotenv: gl-auto-build-variables.env
-    paths:
-      - /app/dist
 
 # test-job:
 #   TODO
@@ -51,7 +48,6 @@ deploy-helm:
     # Decode the base64-encoded kubeconfig from CI/CD variable and set it for kubectl/helm.
     - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
-    - kubectl get pod $HOSTNAME -n scalyshop -o jsonpath="{.spec.serviceAccountName}"
   script:
     - echo "Deploying the application using Helm upgrade --install..."
     - echo "${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG}"
