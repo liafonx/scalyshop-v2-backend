@@ -1,8 +1,8 @@
-gitlabUrl: https://git.chalmers.se
-runnerToken: "glrt-t2_Brh1GCFkQXJrsen7i7ig"
+gitlabUrl: https://gitlab.com
+runnerToken: "glrt-t2_aQnW-7ENwD134Uu1aCy_"
 
-#rbac:
-#    create: true
+rbac:
+    create: true
 
 runners:
   config: |

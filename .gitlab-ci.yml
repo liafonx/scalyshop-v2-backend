@@ -13,8 +13,6 @@ stages:
 
 build-job:
   stage: build
-  tags:
-    - test
   image: 'registry.gitlab.com/gitlab-org/cluster-integration/auto-build-image:${AUTO_BUILD_IMAGE_VERSION}'
   services:
     - name: 'docker:24.0.5-dind'
@@ -44,8 +42,6 @@ build-job:
 
 deploy-helm:
   stage: deploy
-  tags:
-    - test
   image: dtzar/helm-kubectl
   dependencies:
     - build-job
