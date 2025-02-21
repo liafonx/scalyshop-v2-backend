@@ -16,7 +16,9 @@ build-job:
   image: 'registry.gitlab.com/gitlab-org/cluster-integration/auto-build-image:${AUTO_BUILD_IMAGE_VERSION}'
   services:
     - name: 'docker:24.0.5-dind'
-      command: ['--tls=false', '--host=tcp://localhost:2375']
+#      command: ['--tls=false', '--host=tcp://localhost:2375']
+      variables:
+        HEALTHCHECK_TCP_PORT: "2375"
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker info
