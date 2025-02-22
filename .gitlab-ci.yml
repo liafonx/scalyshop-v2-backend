@@ -32,7 +32,7 @@ build-job:
     - docker build --cache-from $CI_APPLICATION_REPOSITORY:latest -t $CI_APPLICATION_REPOSITORY:latest -t $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG .
     - docker push $CI_APPLICATION_REPOSITORY:latest
     - docker push $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG
-    - echo "CI_APPLICATION_TAG is set to: $CI_APPLICATION_TAG"
+    - echo "CI_APPLICATION_TAG is set to $CI_APPLICATION_TAG"
     - |
       docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' | while read repo tag id; do
         if [ "$tag" != "$CI_APPLICATION_TAG" ] && [ "$tag" != "latest" ]; then
@@ -59,7 +59,7 @@ deploy-helm:
     - export KUBECONFIG=$PWD/kubeconfig
   script:
     - echo "Deploying the application using Helm upgrade --install..."
-    - echo "Using image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+    - echo "Using image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
     - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository=$CI_REGISTRY_IMAGE,image.tag=$CI_COMMIT_SHA
     - kubectl wait --for=condition=Available --timeout=60s deployment/scalyshop-frontend -n scalyshop
   rules:
