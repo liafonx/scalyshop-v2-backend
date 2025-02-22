@@ -55,7 +55,6 @@ const metricsMiddleware = promBundle({
     promClient: {
         collectDefaultMetrics: {}
     },
-    buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500],
     httpDurationMetricName: 'http_request_duration_ms'
 });
 // add the prometheus middleware to all routes
