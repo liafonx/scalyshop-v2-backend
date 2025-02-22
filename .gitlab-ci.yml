@@ -32,6 +32,15 @@ build-job:
     - docker push $CI_APPLICATION_REPOSITORY:latest
     - docker push $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG
     - echo "CI_APPLICATION_TAG is set to $CI_APPLICATION_TAG"
+    - |
+      docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' | while read repo tag id; do
+        if [ "$tag" != "$CI_APPLICATION_TAG" ] && [ "$tag" != "latest" ]; then
+          echo "Removing image $repo:$tag ($id)"
+          docker rmi -f "$id"
+        else
+          echo "Keeping image $repo:$tag ($id)"
+        fi
+      done
   rules:
     - if: $CI_COMMIT_BRANCH == 'backend-local'
 
@@ -50,7 +59,10 @@ deploy-helm:
   script:
     - echo "Deploying the application using Helm upgrade --install..."
     - echo "Using image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
-    - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository="${CI_REGISTRY_IMAGE}",image.tag="${CI_COMMIT_SHA}"
+    - |
+      helm upgrade --install scalyshop-backend ./scalyshop-backend \
+        --set image.repository=$CI_REGISTRY_IMAGE \
+        --set image.tag=$CI_COMMIT_SHORT_SHA
     - kubectl wait --for=condition=Available --timeout=60s deployment/scalyshop-frontend -n scalyshop
   rules:
     - if: '$CI_COMMIT_BRANCH == "backend-local"'
