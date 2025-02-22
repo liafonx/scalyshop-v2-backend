@@ -26,7 +26,7 @@ build-job:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - |
       docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' | while read repo tag id; do
-        if [ "$tag" != "$CI_APPLICATION_TAG" ] && [ "$tag" != "latest" ]; then
+        if [ "$tag" != "$CI_COMMIT_SHORT_SHA" ] && [ "$tag" != "latest" ]; then
           echo "Removing image $repo:$tag ($id)"
           docker rmi -f "$id"
         else
