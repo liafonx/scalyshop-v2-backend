@@ -32,15 +32,6 @@ build-job:
     - docker push $CI_APPLICATION_REPOSITORY:latest
     - docker push $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG
     - echo "CI_APPLICATION_TAG is set to $CI_APPLICATION_TAG"
-    - |
-      docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' | while read repo tag id; do
-        if [ "$tag" != "$CI_APPLICATION_TAG" ] && [ "$tag" != "latest" ]; then
-          echo "Removing image $repo:$tag ($id)"
-          docker rmi -f "$id"
-        else
-          echo "Keeping image $repo:$tag ($id)"
-        fi
-      done
   rules:
     - if: $CI_COMMIT_BRANCH == 'backend-local'
 
