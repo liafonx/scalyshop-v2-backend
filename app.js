@@ -52,10 +52,10 @@ const metricsMiddleware = promBundle({
     includePath: true,
     includeStatusCode: true,
     includeUp: true,
-    customLabels: {project_name: 'scalyshop-backend', project_type: 'test_metrics_labels'},
     promClient: {
         collectDefaultMetrics: {}
-    }
+    },
+    buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500]
 });
 // add the prometheus middleware to all routes
 app.use(metricsMiddleware)
@@ -65,7 +65,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/metrics', function(req, res) {
-    res.json({'message': 'Metrics data'});
+    res.set('Content-Type', promBundle.register.contentType)
+    res.end(promBundle.register.metrics())
 });
 
 app.get('/api/serverstatus', function(req, res) {
