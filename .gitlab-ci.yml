@@ -34,7 +34,7 @@ build-job:
         fi
       done
   rules:
-    - if: $CI_COMMIT_BRANCH == 'backend-local'
+    - if: $CI_COMMIT_BRANCH == "backend-local"
 
 # test-job:
 #   TODO
@@ -57,4 +57,4 @@ deploy-helm:
         --set image.tag=$CI_COMMIT_SHORT_SHA
     - kubectl wait --for=condition=Available --timeout=60s deployment/scalyshop-backend -n scalyshop
   rules:
-    - if: '$CI_COMMIT_BRANCH == "backend-local"'
+    - if: $CI_COMMIT_BRANCH == "backend-local"
