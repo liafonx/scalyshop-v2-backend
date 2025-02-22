@@ -20,18 +20,19 @@ build-job:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
+    - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t $CI_REGISTRY_IMAGE:latest -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - docker push $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - echo "CI_COMMIT_SHORT_SHA is set to $CI_COMMIT_SHORT_SHA"
     - |
-      if [[ -z "$CI_COMMIT_TAG" ]]; then
-        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
-        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
-      else
-        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
-        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
-      fi
-    - docker build --cache-from $CI_APPLICATION_REPOSITORY:latest -t $CI_APPLICATION_REPOSITORY:latest -t $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG .
-    - docker push $CI_APPLICATION_REPOSITORY:latest
-    - docker push $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG
-    - echo "CI_APPLICATION_TAG is set to $CI_APPLICATION_TAG"
+      docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' | while read repo tag id; do
+        if [ "$tag" != "$CI_COMMIT_SHORT_SHA" ] && [ "$tag" != "latest" ]; then
+          echo "Removing image $repo:$tag ($id)"
+          docker rmi -f "$id"
+        else
+          echo "Keeping image $repo:$tag ($id)"
+        fi
+      done
   rules:
     - if: $CI_COMMIT_BRANCH == 'backend-local'
 
@@ -49,11 +50,11 @@ deploy-helm:
     - export KUBECONFIG=$PWD/kubeconfig
   script:
     - echo "Deploying the application using Helm upgrade --install..."
-    - echo "Using image ${CI_REGISTRY_IMAGE}:${CI_APPLICATION_REPOSITORY}"
+    - echo "Using image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
     - |
       helm upgrade --install scalyshop-backend ./scalyshop-backend \
-        --set image.repository=$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG \
-        --set image.tag=$CI_COMMIT_SHA
+        --set image.repository=$CI_REGISTRY_IMAGE \
+        --set image.tag=$CI_COMMIT_SHORT_SHA
     - kubectl wait --for=condition=Available --timeout=60s deployment/scalyshop-frontend -n scalyshop
   rules:
     - if: '$CI_COMMIT_BRANCH == "backend-local"'
