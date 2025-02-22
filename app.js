@@ -44,10 +44,28 @@ app.use(morgan('dev'));
 app.options('*', cors());
 app.use(cors());
 
+const promBundle = require("express-prom-bundle");
 // these are some testing routes that may come in handy during the project
+// Add the options to the prometheus middleware most option are for http_request_duration_seconds histogram metric
+const metricsMiddleware = promBundle({
+    includeMethod: true,
+    includePath: true,
+    includeStatusCode: true,
+    includeUp: true,
+    customLabels: {project_name: 'scalyshop-backend', project_type: 'test_metrics_labels'},
+    promClient: {
+        collectDefaultMetrics: {}
+    }
+});
+// add the prometheus middleware to all routes
+app.use(metricsMiddleware)
 
 app.get('/', function(req, res) {
     res.json({'message': 'OK'});
+});
+
+app.get('/metrics', function(req, res) {
+    res.json({'message': 'Metrics data'});
 });
 
 app.get('/api/serverstatus', function(req, res) {
