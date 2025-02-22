@@ -52,7 +52,7 @@ deploy-helm:
     - echo ${CI_APPLICATION_REPOSITORY}
     - echo $CI_APPLICATION_TAG
     - echo $CI_REGISTRY_IMAGE
-    - ech0 ${CI_COMMIT_SHORT_SHA}
+    - echo ${CI_COMMIT_SHORT_SHA}
     - helm upgrade --install scalyshop-backend ./scalyshop-backend --set image.repository="${CI_APPLICATION_REPOSITORY}",image.tag="${CI_APPLICATION_TAG}"
     - kubectl wait --for=condition=Available --timeout=60s deployment/scalyshop-frontend -n scalyshop
   rules:
