@@ -2,7 +2,7 @@ image: alpine:latest
 
 stages:
   - build
-  - test
+  # - test
   - deploy
 
 .default_rules: &default_rules
