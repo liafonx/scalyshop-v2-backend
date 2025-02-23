@@ -5,6 +5,8 @@ var morgan = require('morgan');
 var path = require('path');
 var cors = require('cors');
 var history = require('connect-history-api-fallback');
+var promBundle = require("express-prom-bundle");
+var promClient = require("prom-client");
 
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
@@ -44,6 +46,28 @@ app.use(morgan('dev'));
 app.options('*', cors());
 app.use(cors());
 
+// config Prometheus
+var metricsMiddleware = promBundle({
+    includeMethod: true,
+    includePath: true,
+    includeStatusCode: true,
+    normalizePath: true,
+  });
+app.use(metricsMiddleware);
+
+// monitoring request duration
+const httpRequestDurationMicroseconds = new promClient.Histogram({
+    name: "http_request_duration_seconds",
+    help: "HTTP request duration",
+    labelNames: ["method", "route", "status_code"],
+    buckets: [0.1, 0.5, 1, 2, 5],
+  });
+  client.register.registerMetric(httpRequestDurationMicroseconds);
+
+  app.get("/metrics", async (req, res) => {
+    res.set("Content-Type", promClient.register.contentType);
+    res.end(await promClient.register.metrics());
+  });
 // these are some testing routes that may come in handy during the project
 
 app.get('/', function(req, res) {

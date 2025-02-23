@@ -8,8 +8,7 @@ stages:
 .default_rules: &default_rules
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_BRANCH == "feat-ci"
-    - if: $CI_COMMIT_BRANCH == "feat-ingress"
+    - if: $CI_COMMIT_BRANCH == "feat-business-metric"
     - if: $CI_COMMIT_BRANCH == "dev"
   tags:
     - test  # Only run on runners with this tag
