@@ -5,6 +5,12 @@ var Order = require('../models/order');
 
 var router = express.Router();
 
+var ordersRequestTotal = new promClient.Counter({
+    name: 'orders_requests_total',
+    help: 'Total number of requests to /api/orders',
+  });
+  promClient.register.registerMetric(ordersRequestTotal);
+
 var orderValueHistogram = new promClient.Histogram({
     name: 'order_total_value',
     help: 'Total value of an order at checkout',
@@ -14,6 +20,7 @@ promClient.register.registerMetric(orderValueHistogram);
 
 // Return all orders
 router.get('/api/orders', function(req, res, next) {
+    ordersRequestTotal.inc();
     Order.find()
     .then(orders => {
         res.json({'orders': orders});
@@ -67,13 +74,15 @@ router.delete('/api/orders/:id', function(req, res, next) {
 // Add a new order
 router.post('/api/orders', function(req, res, next) {
     var neworder = new Order(req.body);
+
+    console.log("Observing totalPrice:", req.body?.totalPrice);
+    orderValueHistogram.observe(req.body.totalPrice);
+
     neworder.save()
     .catch(error => {
         console.log('Error storing object: '+error);
         return res.status(400).json({'message': 'Error storing object: '+error});
     });
-
-    orderValueHistogram.observe(req.body?.totalPrice||0);
     return res.status(201).json(neworder);
 });
 

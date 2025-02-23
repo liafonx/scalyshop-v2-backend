@@ -62,7 +62,7 @@ const httpRequestDurationMicroseconds = new promClient.Histogram({
     labelNames: ["method", "route", "status_code"],
     buckets: [0.1, 0.5, 1, 2, 5],
   });
-  promClient.register.registerMetric(httpRequestDurationMicroseconds);
+promClient.register.registerMetric(httpRequestDurationMicroseconds);
 
 // these are some testing routes that may come in handy during the project
 
