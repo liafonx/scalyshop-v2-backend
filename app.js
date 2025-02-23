@@ -100,14 +100,18 @@ app.use('/api/*', function (req, res) {
     res.status(404).json({ 'message': 'Not Found' });
 });
 
-app.get("/metrics", async (req, res) => {
-    res.set("Content-Type", promClient.register.contentType);
-    res.end(await promClient.register.metrics());
-  });
-
 // Configuration for serving frontend in production mode
 // Support Vuejs HTML 5 history mode
 app.use(history());
+
+app.get("/metrics", async (req, res) => {
+    // FIXME: for test
+    const allMetrics = await promClient.register.getMetricsAsJSON()
+    console.log('allMetrics>>>>> ',allMetrics)
+    res.set("Content-Type", promClient.register.contentType);
+    res.end(await promClient.register.metrics());
+  });
+  
 // Serve static assets
 var root = path.normalize(__dirname + '/..');
 var client = path.join(root, 'client', 'dist');
