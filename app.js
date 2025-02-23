@@ -56,6 +56,15 @@ const metricsBundle = promBundle({
     }
 });
 
+const orderPriceRecorder = new promClient.Counter({
+        name: 'per_order_price',
+        help: 'Record the price of each order',
+        labelNames:['orderRef']
+    },
+);
+
+app.orderPriceRecorder = orderPriceRecorder;
+
 // add the prometheus middleware to all routes
 app.use(metricsBundle)
 
@@ -123,3 +132,5 @@ app.listen(port, function(err) {
     console.log(`Backend: http://localhost:${port}/api/`);
     console.log(`Frontend (production): http://localhost:${port}/`);
 });
+
+module.exports = app;

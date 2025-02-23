@@ -1,15 +1,9 @@
 var express = require('express');
 var glob = require("glob");
 var Order = require('../models/order');
-
+const app = require("../app");
+const orderPriceRecorder = app.orderPriceRecorder;
 var router = express.Router();
-
-const orderPriceRecorder = new app.promClient.Counter({
-        name: 'per_order_price',
-        help: 'Record the price of each order',
-        labelNames:['orderRef']
-    },
-);
 
 // Return all orders
 router.get('/api/orders', function (req, res, next) {
@@ -71,10 +65,6 @@ router.post('/api/orders', function (req, res, next) {
             console.log('Error storing object: ' + error);
             return res.status(400).json({'message': 'Error storing object: ' + error});
         });
-//    orderPriceRecorder.inc(
-//        {orderRef: neworder.orderRef},
-//        neworder.totalPrice
-//    )
     return res.status(201).json(neworder);
 });
 
@@ -92,6 +82,13 @@ router.patch('/api/orders/:id', function (req, res, next) {
             order.orderStatus = (req.body.orderStatus || order.orderStatus);
             order.productsList = (req.body.productsList || order.productsList);
             order.save();
+
+            if (req.body.orderStatus === "Confirmed") {
+                orderPriceRecorder.inc(
+                    {orderRef: order.orderRef},
+                    order.totalPrice
+                )
+            }
             res.json(order);
         })
         .catch(err => {
