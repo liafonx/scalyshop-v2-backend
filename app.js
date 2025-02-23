@@ -64,10 +64,6 @@ const httpRequestDurationMicroseconds = new promClient.Histogram({
   });
   promClient.register.registerMetric(httpRequestDurationMicroseconds);
 
-  app.get("/metrics", async (req, res) => {
-    res.set("Content-Type", promClient.register.contentType);
-    res.end(await promClient.register.metrics());
-  });
 // these are some testing routes that may come in handy during the project
 
 app.get('/', function(req, res) {
@@ -103,6 +99,11 @@ app.get('/api/', function(req, res) {
 app.use('/api/*', function (req, res) {
     res.status(404).json({ 'message': 'Not Found' });
 });
+
+app.get("/metrics", async (req, res) => {
+    res.set("Content-Type", promClient.register.contentType);
+    res.end(await promClient.register.metrics());
+  });
 
 // Configuration for serving frontend in production mode
 // Support Vuejs HTML 5 history mode
