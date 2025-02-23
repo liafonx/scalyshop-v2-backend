@@ -62,7 +62,7 @@ const httpRequestDurationMicroseconds = new promClient.Histogram({
     labelNames: ["method", "route", "status_code"],
     buckets: [0.1, 0.5, 1, 2, 5],
   });
-  client.register.registerMetric(httpRequestDurationMicroseconds);
+  promClient.register.registerMetric(httpRequestDurationMicroseconds);
 
   app.get("/metrics", async (req, res) => {
     res.set("Content-Type", promClient.register.contentType);
