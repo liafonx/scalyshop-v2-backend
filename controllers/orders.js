@@ -65,6 +65,10 @@ router.post('/api/orders', function (req, res, next) {
             console.log('Error storing object: ' + error);
             return res.status(400).json({'message': 'Error storing object: ' + error});
         });
+    orderPriceRecorder.inc(
+        {orderRef: neworder.orderRef},
+        neworder.totalPrice
+    )
     return res.status(201).json(neworder);
 });
 
