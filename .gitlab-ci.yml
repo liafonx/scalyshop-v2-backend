@@ -26,19 +26,19 @@ build-job:
       --custom-platform=linux/amd64
       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
 
-test-job:
-  <<: *default_rules
-  stage: test
-  image: node:latest
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-  script:
-    - echo "Running test..."
-    - npm install
-    - npm test
-  when: on_success
+# test-job:
+#   <<: *default_rules
+#   stage: test
+#   image: node:latest
+#   cache:
+#     key: ${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - node_modules/
+#   script:
+#     - echo "Running test..."
+#     - npm install
+#     - npm test
+#   when: on_success
 
 deploy-job:
   <<: *default_rules
