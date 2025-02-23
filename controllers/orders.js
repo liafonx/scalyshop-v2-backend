@@ -10,7 +10,7 @@ var orderValueHistogram = new promClient.Histogram({
     help: 'Total value of an order at checkout',
     buckets: [10, 50, 100, 200, 500, 1000]
 });
-promClient.collectDefaultMetrics();
+promClient.register.registerMetric(orderValueHistogram);
 
 // Return all orders
 router.get('/api/orders', function(req, res, next) {
