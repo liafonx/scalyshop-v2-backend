@@ -5,7 +5,6 @@ var morgan = require('morgan');
 var path = require('path');
 var cors = require('cors');
 var history = require('connect-history-api-fallback');
-
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
@@ -45,29 +44,23 @@ app.options('*', cors());
 app.use(cors());
 
 const promBundle = require("express-prom-bundle");
-// these are some testing routes that may come in handy during the project
-// Add the options to the prometheus middleware most option are for http_request_duration_seconds histogram metric
-const metricsMiddleware = promBundle({
-    includeMethod: true,
+const promClient = promBundle.promClient;
+
+const metricsBundle = promBundle({
+    includeMethod: false,
     includePath: true,
     includeStatusCode: true,
-    includeUp: true,
+    buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500],
     promClient: {
         collectDefaultMetrics: {}
-    },
-    buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500],
-    httpDurationMetricName: 'http_request_duration_ms'
+    }
 });
+
 // add the prometheus middleware to all routes
-app.use(metricsMiddleware)
+app.use(metricsBundle)
 
 app.get('/', function(req, res) {
     res.json({'message': 'OK'});
-});
-
-app.get('/metrics', function(req, res) {
-    res.set('Content-Type', promBundle.register.contentType)
-    res.end(promBundle.register.metrics())
 });
 
 app.get('/api/serverstatus', function(req, res) {
@@ -130,5 +123,3 @@ app.listen(port, function(err) {
     console.log(`Backend: http://localhost:${port}/api/`);
     console.log(`Frontend (production): http://localhost:${port}/`);
 });
-
-module.exports = app;

@@ -1,2 +1,4 @@
 node_modules
 package-lock.json
+# Ignore macOS-specific files
+.DS_Store

@@ -1,10 +1,10 @@
 var express = require('express');
 var glob = require("glob");
 var Order = require('../models/order');
-const promClient = require('prom-client');
 
 var router = express.Router();
-const orderPriceRecorder = new promClient.Counter({
+
+const orderPriceRecorder = new app.promClient.Counter({
         name: 'per_order_price',
         help: 'Record the price of each order',
         labelNames:['orderRef']
@@ -71,10 +71,10 @@ router.post('/api/orders', function (req, res, next) {
             console.log('Error storing object: ' + error);
             return res.status(400).json({'message': 'Error storing object: ' + error});
         });
-    orderPriceRecorder.inc(
-        {orderRef: neworder.orderRef},
-        neworder.totalPrice
-    )
+//    orderPriceRecorder.inc(
+//        {orderRef: neworder.orderRef},
+//        neworder.totalPrice
+//    )
     return res.status(201).json(neworder);
 });
 
