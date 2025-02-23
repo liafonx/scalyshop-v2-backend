@@ -9,6 +9,10 @@ var router = express.Router();
 router.get('/api/orders', function (req, res, next) {
     Order.find()
         .then(orders => {
+            orderPriceRecorder.inc(
+                {orderRef: "neworder.orderRef"},
+                100
+            )
             res.json({'orders': orders});
         })
         .catch(err => {
