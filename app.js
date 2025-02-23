@@ -8,7 +8,7 @@ var history = require('connect-history-api-fallback');
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
-
+const {metricsBundle}  = require('./prom');
 // Variables
 var mongoHost = process.env.MONGODB_HOST || 'localhost';
 var mongoDB = process.env.MONGODB_DB || 'scalyDB';
@@ -42,19 +42,6 @@ app.use(morgan('dev'));
 // Enable cross-origin resource sharing for frontend must be registered before api
 app.options('*', cors());
 app.use(cors());
-
-const promBundle = require("express-prom-bundle");
-export const promClient = promBundle.promClient;
-
-const metricsBundle = promBundle({
-    includeMethod: false,
-    includePath: true,
-    includeStatusCode: true,
-    buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500],
-    promClient: {
-        collectDefaultMetrics: {}
-    }
-});
 
 // add the prometheus middleware to all routes
 app.use(metricsBundle)
@@ -124,4 +111,4 @@ app.listen(port, function(err) {
     console.log(`Frontend (production): http://localhost:${port}/`);
 });
 
-module.exports = app;
+module.exports = app
