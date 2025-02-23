@@ -1,9 +1,15 @@
 var express = require('express');
 var glob = require("glob");
 var Order = require('../models/order');
-const app = require("../app");
-const orderPriceRecorder = app.orderPriceRecorder;
+import { promClient } from '../app.js';
 var router = express.Router();
+
+const orderPriceRecorder = new promClient.Counter({
+        name: 'per_order_price',
+        help: 'Record the price of each order',
+        labelNames:['orderRef']
+    },
+);
 
 // Return all orders
 router.get('/api/orders', function (req, res, next) {
