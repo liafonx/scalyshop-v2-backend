@@ -56,17 +56,19 @@ app.options("*", cors());
 app.use(cors());
 
 // config Prometheus
+const register = new promClient.Registry();
 var metricsMiddleware = promBundle({
   includeMethod: true,
   includePath: true,
   includeStatusCode: true,
   normalizePath: true,
+  register
 });
 app.use(metricsMiddleware);
 
 // monitoring
-const register = new promClient.Registry();
 promClient.collectDefaultMetrics({ register });
+
 const testHistogram = new promClient.Histogram({
   name: "http_request_duration_seconds_test",
   help: "for test",
