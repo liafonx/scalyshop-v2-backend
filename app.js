@@ -80,7 +80,7 @@ register.registerMetric(orderValueHistogram);
 // these are some testing routes that may come in handy during the project
 
 app.get("/", function (req, res) {
-  testHistogram.labels("handler").observe(1.5);
+  testHistogram.labels("homeHandler", "GET", "200").observe(1.5);
   res.json({ message: "OK" });
 });
 
