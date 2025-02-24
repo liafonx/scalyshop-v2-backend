@@ -63,6 +63,7 @@ promClient.register.registerMetric(orderValueHistogram);
 // these are some testing routes that may come in handy during the project
 
 app.get('/', function(req, res) {
+    ordersRequestTotal.inc();
     res.json({'message': 'OK'});
 });
 
@@ -88,6 +89,7 @@ app.use(ordersController);
 app.use(favoriteController)
 
 app.get('/api/', function(req, res) {
+    ordersRequestTotal.inc();
     res.json({'message': 'Welcome to the ScalyShop API!'});
 });
 
