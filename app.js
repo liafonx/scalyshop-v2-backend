@@ -1,21 +1,21 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var morgan = require('morgan');
-var path = require('path');
-var cors = require('cors');
-var history = require('connect-history-api-fallback');
+var express = require("express");
+var bodyParser = require("body-parser");
+var mongoose = require("mongoose");
+var morgan = require("morgan");
+var path = require("path");
+var cors = require("cors");
+var history = require("connect-history-api-fallback");
 var promBundle = require("express-prom-bundle");
 var promClient = require("prom-client");
 
-var productsController = require('./controllers/products');
-var ordersController = require('./controllers/orders');
-const favoriteController = require('./controllers/favorites');
-const { orderValueHistogram, ordersRequestTotal } = require("./utils/monitor")
+var productsController = require("./controllers/products");
+var ordersController = require("./controllers/orders");
+const favoriteController = require("./controllers/favorites");
+const { orderValueHistogram, ordersRequestTotal } = require("./utils/monitor");
 
 // Variables
-var mongoHost = process.env.MONGODB_HOST || 'localhost';
-var mongoDB = process.env.MONGODB_DB || 'scalyDB';
+var mongoHost = process.env.MONGODB_HOST || "localhost";
+var mongoDB = process.env.MONGODB_DB || "scalyDB";
 // var mongoPort = process.env.MONGODB_PORT || '27017';
 var mongoUser = process.env.MONGODB_USER || undefined;
 var mongoPW = process.env.MONGODB_PW || undefined;
@@ -24,17 +24,25 @@ var port = process.env.BACKEND_PORT || 5045;
 // Connect to MongoDB
 // Connection string format: mongodb://root:hugo@localhost:27017/scalyDB
 // (or alternatively, without authentication: mongodb://localhost:27017/scalyDB)
-if(mongoUser) {
-    var mongoUri = "mongodb://"+mongoUser+":"+mongoPW+"@"+mongoHost+":27017/"+mongoDB
+if (mongoUser) {
+  var mongoUri =
+    "mongodb://" +
+    mongoUser +
+    ":" +
+    mongoPW +
+    "@" +
+    mongoHost +
+    ":27017/" +
+    mongoDB;
 } else {
-    var mongoUri = "mongodb://"+mongoHost+":27017/"+mongoDB
+  var mongoUri = "mongodb://" + mongoHost + ":27017/" + mongoDB;
 }
 
-console.log("Trying to connect to "+mongoUri)
-mongoose.connect(mongoUri).catch(error => {
-    console.error(`Failed to connect to MongoDB with URI: ${mongoUri}`);
-    console.error(error.stack);
-    process.exit(1);
+console.log("Trying to connect to " + mongoUri);
+mongoose.connect(mongoUri).catch((error) => {
+  console.error(`Failed to connect to MongoDB with URI: ${mongoUri}`);
+  console.error(error.stack);
+  process.exit(1);
 });
 
 // Create Express app
@@ -42,60 +50,69 @@ var app = express();
 // Parse requests of content-type 'application/json'
 app.use(bodyParser.json());
 // HTTP request logger
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 // Enable cross-origin resource sharing for frontend must be registered before api
-app.options('*', cors());
+app.options("*", cors());
 app.use(cors());
 
 // config Prometheus
 var metricsMiddleware = promBundle({
-    includeMethod: true,
-    includePath: true,
-    includeStatusCode: true,
-    normalizePath: true,
-  });
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  normalizePath: true,
+});
 app.use(metricsMiddleware);
 
 // monitoring
-promClient.register.registerMetric(ordersRequestTotal);
-promClient.register.registerMetric(orderValueHistogram);
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+const testHistogram = new promClient.Histogram({
+  name: "http_request_duration_seconds_test",
+  help: "for test",
+  labelNames: ["handler", "method", "statuscode"],
+  buckets: [0.1, 0.5, 1, 2, 5],
+});
+register.registerMetric(testHistogram);
+register.registerMetric(ordersRequestTotal);
+register.registerMetric(orderValueHistogram);
 
 // these are some testing routes that may come in handy during the project
 
-app.get('/', function(req, res) {
-    ordersRequestTotal.inc();
-    res.json({'message': 'OK'});
+app.get("/", function (req, res) {
+  testHistogram.labels("1111").observe(1.5);
+  res.json({ message: "OK" });
 });
 
-app.get('/api/serverstatus', function(req, res) {
-    res.json({'message': 'Your server appears to be live and well.😊'});
+app.get("/api/serverstatus", function (req, res) {
+  res.json({ message: "Your server appears to be live and well.😊" });
 });
 
 // return an error (on purpose, for monitoring testing)
-app.post('/api/error', function(req, res, next) {
-    var errorcode = req.query.statuscode || 404;
-    console.log("Generating error on purpose: "+errorcode);
-    res.status(errorcode).json({'Error': true});
+app.post("/api/error", function (req, res, next) {
+  var errorcode = req.query.statuscode || 404;
+  console.log("Generating error on purpose: " + errorcode);
+  res.status(errorcode).json({ Error: true });
 });
 
 // go into an endless loop (this should block the entire server)
-app.post('/api/crash', function(req, res, next) {
-    console.log("Crash server via an endless loop");
-    for(;;);
+app.post("/api/crash", function (req, res, next) {
+  console.log("Crash server via an endless loop");
+  for (;;);
 });
 
 app.use(productsController);
 app.use(ordersController);
-app.use(favoriteController)
+app.use(favoriteController);
 
-app.get('/api/', function(req, res) {
-    ordersRequestTotal.inc();
-    res.json({'message': 'Welcome to the ScalyShop API!'});
+app.get("/api/", function (req, res) {
+  ordersRequestTotal.inc();
+  res.json({ message: "Welcome to the ScalyShop API!" });
 });
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
-app.use('/api/*', function (req, res) {
-    res.status(404).json({ 'message': 'Not Found' });
+app.use("/api/*", function (req, res) {
+  res.status(404).json({ message: "Not Found" });
 });
 
 // Configuration for serving frontend in production mode
@@ -103,36 +120,36 @@ app.use('/api/*', function (req, res) {
 app.use(history());
 
 app.get("/metrics", async (req, res) => {
-    res.set("Content-Type", promClient.register.contentType);
-    res.end(await promClient.register.metrics());
-  });
-  
+  res.set("Content-Type", promClient.register.contentType);
+  res.end(await promClient.register.metrics());
+});
+
 // Serve static assets
-var root = path.normalize(__dirname + '/..');
-var client = path.join(root, 'client', 'dist');
+var root = path.normalize(__dirname + "/..");
+var client = path.join(root, "client", "dist");
 app.use(express.static(client));
 
 // Error handler (i.e., when exception is thrown) must be registered last
-var env = app.get('env');
+var env = app.get("env");
 // eslint-disable-next-line no-unused-vars
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    var err_res = {
-        'message': err.message,
-        'error': {}
-    };
-    if (env === 'development') {
-        err_res['error'] = err;
-    }
-    res.status(err.status || 30);
-    res.json(err_res);
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  var err_res = {
+    message: err.message,
+    error: {},
+  };
+  if (env === "development") {
+    err_res["error"] = err;
+  }
+  res.status(err.status || 30);
+  res.json(err_res);
 });
 
-app.listen(port, function(err) {
-    if (err) throw err;
-    console.log(`Express server listening on port ${port}, in ${env} mode`);
-    console.log(`Backend: http://localhost:${port}/api/`);
-    console.log(`Frontend (production): http://localhost:${port}/`);
+app.listen(port, function (err) {
+  if (err) throw err;
+  console.log(`Express server listening on port ${port}, in ${env} mode`);
+  console.log(`Backend: http://localhost:${port}/api/`);
+  console.log(`Frontend (production): http://localhost:${port}/`);
 });
 
 module.exports = app;
