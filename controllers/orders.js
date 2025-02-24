@@ -1,22 +1,8 @@
 var express = require('express');
 var glob = require("glob");
-var promClient = require('prom-client');
 var Order = require('../models/order');
-
 var router = express.Router();
-
-var ordersRequestTotal = new promClient.Counter({
-    name: 'orders_requests_total',
-    help: 'Total number of requests to /api/orders',
-  });
-  promClient.register.registerMetric(ordersRequestTotal);
-
-var orderValueHistogram = new promClient.Histogram({
-    name: 'order_total_value',
-    help: 'Total value of an order at checkout',
-    buckets: [10, 50, 100, 200, 500, 1000]
-});
-promClient.register.registerMetric(orderValueHistogram);
+const { orderValueHistogram, ordersRequestTotal } = require("../utils/monitor")
 
 // Return all orders
 router.get('/api/orders', function(req, res, next) {
@@ -76,7 +62,7 @@ router.post('/api/orders', function(req, res, next) {
     var neworder = new Order(req.body);
 
     console.log("Observing totalPrice:", req.body?.totalPrice);
-    orderValueHistogram.observe(req.body.totalPrice);
+    orderValueHistogram.observe(req.body.totalPrice||0);
 
     neworder.save()
     .catch(error => {

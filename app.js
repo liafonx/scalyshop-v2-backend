@@ -11,6 +11,7 @@ var promClient = require("prom-client");
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
+const { orderValueHistogram, ordersRequestTotal } = require("./utils/monitor")
 
 // Variables
 var mongoHost = process.env.MONGODB_HOST || 'localhost';
@@ -55,14 +56,9 @@ var metricsMiddleware = promBundle({
   });
 app.use(metricsMiddleware);
 
-// monitoring request duration
-const httpRequestDurationMicroseconds = new promClient.Histogram({
-    name: "http_request_duration_seconds",
-    help: "HTTP request duration",
-    labelNames: ["method", "route", "status_code"],
-    buckets: [0.1, 0.5, 1, 2, 5],
-  });
-promClient.register.registerMetric(httpRequestDurationMicroseconds);
+// monitoring
+promClient.register.registerMetric(ordersRequestTotal);
+promClient.register.registerMetric(orderValueHistogram);
 
 // these are some testing routes that may come in handy during the project
 
@@ -105,9 +101,6 @@ app.use('/api/*', function (req, res) {
 app.use(history());
 
 app.get("/metrics", async (req, res) => {
-    // FIXME: for test
-    const allMetrics = await promClient.register.getMetricsAsJSON()
-    console.log('allMetrics>>>>> ',allMetrics)
     res.set("Content-Type", promClient.register.contentType);
     res.end(await promClient.register.metrics());
   });
