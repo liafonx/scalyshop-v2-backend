@@ -1,8 +1,11 @@
-var promClient = require("prom-client");
+var promBundle = require("express-prom-bundle");
+const promClient = promBundle.promClient
 
-var ordersRequestTotal = new promClient.Counter({
-  name: "orders_requests_total",
-  help: "Total number of requests to /api/orders",
+var metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  normalizePath: true,
 });
 
 var orderValueHistogram = new promClient.Histogram({
@@ -11,4 +14,4 @@ var orderValueHistogram = new promClient.Histogram({
   buckets: [10, 50, 100, 200, 500, 1000],
 });
 
-module.exports = { ordersRequestTotal, orderValueHistogram };
+module.exports = { orderValueHistogram, metricsMiddleware };

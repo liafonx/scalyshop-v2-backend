@@ -5,13 +5,11 @@ var morgan = require("morgan");
 var path = require("path");
 var cors = require("cors");
 var history = require("connect-history-api-fallback");
-var promBundle = require("express-prom-bundle");
-var promClient = require("prom-client");
 
 var productsController = require("./controllers/products");
 var ordersController = require("./controllers/orders");
 const favoriteController = require("./controllers/favorites");
-const { orderValueHistogram, ordersRequestTotal } = require("./utils/monitor");
+const { metricsMiddleware } = require("./utils/monitor");
 
 // Variables
 var mongoHost = process.env.MONGODB_HOST || "localhost";
@@ -56,33 +54,11 @@ app.options("*", cors());
 app.use(cors());
 
 // config Prometheus
-const register = new promClient.Registry();
-var metricsMiddleware = promBundle({
-  includeMethod: true,
-  includePath: true,
-  includeStatusCode: true,
-  normalizePath: true,
-  promRegistry:register
-});
 app.use(metricsMiddleware);
-
-// monitoring
-promClient.collectDefaultMetrics({ register });
-
-const testHistogram = new promClient.Histogram({
-  name: "http_request_duration_seconds_test",
-  help: "for test",
-  labelNames: ["handler", "method", "statuscode"],
-  buckets: [0.1, 0.5, 1, 2, 5],
-});
-register.registerMetric(testHistogram);
-register.registerMetric(ordersRequestTotal);
-register.registerMetric(orderValueHistogram);
 
 // these are some testing routes that may come in handy during the project
 
 app.get("/", function (req, res) {
-  testHistogram.labels("homeHandler", "GET", "200").observe(1.5);
   res.json({ message: "OK" });
 });
 
@@ -108,7 +84,6 @@ app.use(ordersController);
 app.use(favoriteController);
 
 app.get("/api/", function (req, res) {
-  ordersRequestTotal.inc();
   res.json({ message: "Welcome to the ScalyShop API!" });
 });
 
@@ -120,11 +95,6 @@ app.use("/api/*", function (req, res) {
 // Configuration for serving frontend in production mode
 // Support Vuejs HTML 5 history mode
 app.use(history());
-
-app.get("/metrics", async (req, res) => {
-  res.set("Content-Type", promClient.register.contentType);
-  res.end(await promClient.register.metrics());
-});
 
 // Serve static assets
 var root = path.normalize(__dirname + "/..");
