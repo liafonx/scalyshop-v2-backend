@@ -2,11 +2,10 @@ var express = require("express");
 var glob = require("glob");
 var Order = require("../models/order");
 var router = express.Router();
-const { orderValueHistogram, ordersRequestTotal } = require("../utils/monitor");
+const { orderValueHistogram } = require("../utils/monitor");
 
 // Return all orders
 router.get("/api/orders", function (req, res, next) {
-  ordersRequestTotal.inc();
   Order.find()
     .then((orders) => {
       res.json({ orders: orders });
