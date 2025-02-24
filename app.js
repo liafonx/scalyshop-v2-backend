@@ -62,7 +62,7 @@ var metricsMiddleware = promBundle({
   includePath: true,
   includeStatusCode: true,
   normalizePath: true,
-  register
+  promRegistry:register
 });
 app.use(metricsMiddleware);
 
