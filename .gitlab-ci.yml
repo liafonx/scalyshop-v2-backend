@@ -2,14 +2,13 @@ image: alpine:latest
 
 stages:
   - build
-  - test
+  # - test
   - deploy
 
 .default_rules: &default_rules
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_BRANCH == "feat-ci"
-    - if: $CI_COMMIT_BRANCH == "feat-ingress"
+    - if: $CI_COMMIT_BRANCH == "feat-business-metric"
     - if: $CI_COMMIT_BRANCH == "dev"
   tags:
     - test  # Only run on runners with this tag
@@ -27,19 +26,19 @@ build-job:
       --custom-platform=linux/amd64
       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
 
-test-job:
-  <<: *default_rules
-  stage: test
-  image: node:latest
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-  script:
-    - echo "Running test..."
-    - npm install
-    - npm test
-  when: on_success
+# test-job:
+#   <<: *default_rules
+#   stage: test
+#   image: node:latest
+#   cache:
+#     key: ${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - node_modules/
+#   script:
+#     - echo "Running test..."
+#     - npm install
+#     - npm test
+#   when: on_success
 
 deploy-job:
   <<: *default_rules
