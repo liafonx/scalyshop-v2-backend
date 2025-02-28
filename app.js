@@ -6,6 +6,7 @@ var path = require('path');
 var cors = require('cors');
 var history = require('connect-history-api-fallback');
 
+const { unleash } = require('./utils/unleash');
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
@@ -34,6 +35,12 @@ mongoose.connect(mongoUri).catch(error => {
     process.exit(1);
 });
 
+// unleash
+unleash.on('ready', () => {
+    console.log('Unleash client is ready!');
+  });
+unleash.on('error', console.error);
+  
 // Create Express app
 var app = express();
 // Parse requests of content-type 'application/json'

@@ -31,7 +31,7 @@
     "glob": "^11.0.0",
     "mongoose": "^8.5.3",
     "morgan": "^1.10.0",
-    "unleash-client": "^6.1.1",
+    "unleash-client": "^6.1.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
