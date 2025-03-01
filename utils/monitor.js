@@ -14,4 +14,12 @@ var orderValueHistogram = new promClient.Histogram({
   buckets: [10, 50, 100, 200, 500, 1000],
 });
 
-module.exports = { orderValueHistogram, metricsMiddleware };
+// Initialize Prometheus counter
+const productSortCounter = new promClient.Counter({
+  name: 'product_sort_ab_test',
+  help: 'Counts the number of times each version of the product sort is used',
+  labelNames: ['version']
+});
+
+
+module.exports = { orderValueHistogram, metricsMiddleware, productSortCounter };

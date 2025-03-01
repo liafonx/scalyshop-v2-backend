@@ -4,19 +4,13 @@ var glob = require("glob");
 var fs = require("fs");
 var Product = require("../models/product");
 const { unleash } = require("../utils/unleash");
-const client = require('prom-client'); // Import prom-client
+const { productSortCounter } = require("../utils/monitor");
 
 var router = express.Router();
 
 const JSON_DUMMY_FILES = "dummy_data";
 const JSON_STRESS_FILES = "stress_data";
 
-// Initialize Prometheus counter
-const productSortCounter = new client.Counter({
-    name: 'product_sort_ab_test',
-    help: 'Counts the number of times each version of the product sort is used',
-    labelNames: ['version']
-});
 
 // Return all products
 router.get("/api/products", function (req, res, next) {

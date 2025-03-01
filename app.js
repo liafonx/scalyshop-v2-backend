@@ -14,10 +14,10 @@ const { unleash } = require('./utils/unleash');
 
 // Variables
 var mongoHost = process.env.MONGODB_HOST || "localhost";
-var mongoDB = process.env.MONGODB_DB || "scalyDB";
+var mongoDB = process.env.MONGODB_DB || "scalyDB2";
 // var mongoPort = process.env.MONGODB_PORT || '27017';
-var mongoUser = process.env.MONGODB_USER || undefined;
-var mongoPW = process.env.MONGODB_PW || undefined;
+var mongoUser = process.env.MONGODB_USER || "team";
+var mongoPW = process.env.MONGODB_PW || "1234";
 var port = process.env.BACKEND_PORT || 5046;
 
 // Connect to MongoDB
