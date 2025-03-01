@@ -10,6 +10,7 @@ var productsController = require("./controllers/products");
 var ordersController = require("./controllers/orders");
 const favoriteController = require("./controllers/favorites");
 const { metricsMiddleware } = require("./utils/monitor");
+const { unleash } = require('./utils/unleash');
 
 // Variables
 var mongoHost = process.env.MONGODB_HOST || "localhost";
@@ -43,6 +44,12 @@ mongoose.connect(mongoUri).catch((error) => {
   process.exit(1);
 });
 
+// unleash
+unleash.on('ready', () => {
+    console.log('Unleash client is ready!');
+  });
+unleash.on('error', console.error);
+  
 // Create Express app
 var app = express();
 // Parse requests of content-type 'application/json'
