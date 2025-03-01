@@ -3,7 +3,6 @@ var glob = require("glob");
 var Order = require("../models/order");
 var router = express.Router();
 const { orderValueHistogram } = require("../utils/monitor");
-const { productSortCounter } = require("../utils/monitor");
 
 
 // Return all orders
