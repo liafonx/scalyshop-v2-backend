@@ -18,7 +18,7 @@ var mongoDB = process.env.MONGODB_DB || "scalyDB";
 // var mongoPort = process.env.MONGODB_PORT || '27017';
 var mongoUser = process.env.MONGODB_USER || undefined;
 var mongoPW = process.env.MONGODB_PW || undefined;
-var port = process.env.BACKEND_PORT || 5045;
+var port = process.env.BACKEND_PORT || 5046;
 
 // Connect to MongoDB
 // Connection string format: mongodb://root:hugo@localhost:27017/scalyDB
@@ -46,10 +46,10 @@ mongoose.connect(mongoUri).catch((error) => {
 
 // unleash
 unleash.on('ready', () => {
-    console.log('Unleash client is ready!');
-  });
+  console.log('Unleash client is ready!');
+});
 unleash.on('error', console.error);
-  
+
 // Create Express app
 var app = express();
 // Parse requests of content-type 'application/json'
@@ -83,7 +83,7 @@ app.post("/api/error", function (req, res, next) {
 // go into an endless loop (this should block the entire server)
 app.post("/api/crash", function (req, res, next) {
   console.log("Crash server via an endless loop");
-  for (;;);
+  for (; ;);
 });
 
 app.use(productsController);
