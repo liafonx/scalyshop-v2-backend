@@ -3,6 +3,8 @@ var glob = require("glob");
 var Order = require("../models/order");
 var router = express.Router();
 const { orderValueHistogram } = require("../utils/monitor");
+const { productSortCounter } = require("../utils/monitor");
+
 
 // Return all orders
 router.get("/api/orders", function (req, res, next) {
@@ -86,7 +88,7 @@ router.patch("/api/orders/:id", function (req, res, next) {
       order.productsList = req.body.productsList || order.productsList;
       order.save();
 
-      if(order.orderStatus === 'Confirmed') {
+      if (order.orderStatus === 'Confirmed') {
         orderValueHistogram.observe(order.totalPrice);
       }
 
