@@ -2,6 +2,8 @@ var express = require('express');
 var glob = require("glob");
 var fs = require("fs");
 var Product = require('../models/product');
+const { unleash } = require('../utils/unleash');
+const { productSortRecorder } = require('../utils/prom');
 
 var router = express.Router();
 
@@ -10,8 +12,17 @@ const JSON_STRESS_FILES='stress_data';
 
 // Return all products
 router.get('/api/products', function(req, res, next) {
-    
-    Product.find()
+    var sortElement = {}
+    if (unleash.isEnabled("products-des-price")) {
+        console.log('products-des-price enabled');
+        sortElement = { price: -1 }
+        productSortRecorder.inc({sort_by:'price_des'})
+    } else {
+        console.log('products-des-price disabled');
+        productSortRecorder.inc({sort_by:'default'})
+    }
+
+    Product.find({}).sort(sortElement)
     .then(products => {
         res.json({'products': products});
     })

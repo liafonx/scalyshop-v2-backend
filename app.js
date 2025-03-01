@@ -8,14 +8,22 @@ var history = require('connect-history-api-fallback');
 var productsController = require('./controllers/products');
 var ordersController = require('./controllers/orders');
 const favoriteController = require('./controllers/favorites');
-const {metricsBundle}  = require('./prom');
+const {metricsBundle} = require('./utils/prom');
+const {unleash} = require('./utils/unleash');
+
 // Variables
-var mongoHost = process.env.MONGODB_HOST || 'localhost';
+var mongoHost = process.env.MONGODB_HOST || 'mongodb.gitlab-managed-apps.svc.cluster.local';
 var mongoDB = process.env.MONGODB_DB || 'scalyDB';
 // var mongoPort = process.env.MONGODB_PORT || '27017';
-var mongoUser = process.env.MONGODB_USER || undefined;
-var mongoPW = process.env.MONGODB_PW || undefined;
+var mongoUser = process.env.MONGODB_USER || 'scaly';
+var mongoPW = process.env.MONGODB_PW || 'scalypw';
 var port = process.env.BACKEND_PORT || 5045;
+
+unleash.on('synchronized', () => {
+    console.log("The unleash SDK has synchronized with the server.")
+    }
+);
+unleash.on('error', console.error);
 
 // Connect to MongoDB
 // Connection string format: mongodb://root:hugo@localhost:27017/scalyDB

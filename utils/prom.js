@@ -12,13 +12,21 @@ const metricsBundle = promBundle({
 });
 
 const orderPriceRecorder = new promClient.Counter({
-        name: 'per_order_price',
+        name: 'per_order_price_count',
         help: 'Record the price of each order',
         labelNames:['orderRef']
     },
 );
 
+const productSortRecorder = new promClient.Counter({
+        name: 'per_request_product_sort_count',
+        help: 'Record the sorting method of products for each request.',
+        labelNames:['sort_by']
+    },
+);
+
 module.exports = {
     metricsBundle,
-    orderPriceRecorder
+    orderPriceRecorder,
+    productSortRecorder
 }

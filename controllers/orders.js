@@ -1,7 +1,7 @@
 var express = require('express');
 var glob = require("glob");
 var Order = require('../models/order');
-const { orderPriceRecorder } = require('../prom');
+const { orderPriceRecorder } = require('../utils/prom');
 var router = express.Router();
 
 // Return all orders
