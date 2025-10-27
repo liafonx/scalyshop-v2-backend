@@ -1,2 +1,7 @@
 node_modules
 package-lock.json
+.DS_Store
+
+# GitLab CI (no longer needed)
+.gitlab-ci.yml
+.gitlab-ci-TEMPLATE.yml
